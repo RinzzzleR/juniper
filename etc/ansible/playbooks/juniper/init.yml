@@ -1,0 +1,40 @@
+---
+- name: juniper initialization playbook #название PB
+  hosts: alljuniper #на какие hosts будем его применять
+#подключаем модуль juniper
+  roles:
+  - Juniper.junos 
+  connection: local
+  gather_facts: no
+#далее объявим переменные логин/пароль для ввода, пароль скрытый
+  vars_prompt:
+    - name: "DEVICE_USERNAME"
+      promt: "Device username"
+      private: no
+    - name: "DEVICE_PASSWORD"
+      promt: "Device password"
+      private: yes
+#объявим переменную для определения настроек подключения
+  vars:
+    provider_info:
+      host: "{{ inventory_hostname }}"
+      username: "{{ DEVICE_USERNAME }}" 
+      password: "{{ DEVICE_PASSWORD }}"
+      port: "{{ ansible_jun_port }}"
+      timeout: "{{ ansible_jun_timeout }}"
+#дальше блок самих задач
+  tasks:
+#проверка доступности нашего порта
+  - name: junos check connection 
+    wait_for:
+      host: "{{ inventory_hostname }}"
+      port: "{{ ansible_jun_port }}"
+      timeout: 10
+#создание пользователя
+  - name: junos create ansible user with key-auth
+    junos_user:
+      provider: "{{ provider_info }}"
+      name: "{{ ansible_jun_username }}"
+      role: super-user
+      sshkey: "{{lookup('file', '/etc/ansible/.ssh/ansible.pub') }}"
+      state: present
