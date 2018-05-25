@@ -4,6 +4,7 @@
 # Juniper: EX3300, EX2200, EX4550
 # JunOS: 12.2R6.4, 12.3R3.4, 12.3R4.6, 12.3R6.6, 12.3R6.6, 12.2R9.4, 12.2R12.4
 
+# модули:http://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#junos
 
 Установка Ansible проста, так как все из коробки (для этой задачи мы использовали ubuntu server 16.04.03):
 
