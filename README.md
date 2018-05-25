@@ -26,3 +26,14 @@ ansible-galaxy list
 
 sudo apt-get install python-pip
 pip install ncclient
+
+
+Для авторизации на устройствах хотелось бы сразу настроить авторизацию по ключу. Генерируем для удобства под root ключ RSA (почему не DSA будет понятно дальше). После копируем его в предварительно созданный /etc/ansible/.ssh для удобства использования.
+
+ssh-keygen -t rsa
+cp /root/.ssh/id_rsa.pub /etc/ansible/.ssh/ansible.pub
+cp /root/.ssh/id_rsa /etc/ansible/.ssh/ansible
+
+По итогу на целевых устройствах необходимо было бы завести вручную пользователя с публичным ключом:
+
+set system login user ansible class super-user authentication ssh-rsa "<SSH-key>"
