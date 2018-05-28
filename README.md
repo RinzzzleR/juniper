@@ -2,7 +2,7 @@
 Список протестированного оборудования
 
 # Juniper: SRX100
-# JunOS: 12.1x46
+# JunOS: 15.1X49-D15.4
 
 модули:http://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#junos 
 
