@@ -1,31 +1,31 @@
 ---
-- name: juniper initialization playbook #название PB
-  hosts: alljuniper #на какие hosts будем его применять
-#подключаем модуль juniper
+- name: juniper main playbook #название PB
+  hosts: alljun #на какие hosts применияем
+#подключение модуля juniper
   roles:
   - Juniper.junos 
   connection: local
   gather_facts: no
-#далее объявим переменные логин/пароль для ввода, пароль скрытый
+#далее объявление переменных логин/пароль для ввода, пароль скрытый
   vars_prompt:
-    - name: "DEVICE_USERNAME"
-      promt: "Device username"
+    - name: "DEV_UNAME"
+      promt: "Dev uname"
       private: no
-    - name: "DEVICE_PASSWORD"
-      promt: "Device password"
+    - name: "DEV_PASS"
+      promt: "Dev pass"
       private: yes
-#объявим переменную для определения настроек подключения
+#объявление переменной для определения настроек подключения
   vars:
     provider_info:
       host: "{{ inventory_hostname }}"
-      username: "{{ DEVICE_USERNAME }}" 
-      password: "{{ DEVICE_PASSWORD }}"
+      username: "{{ DEV_UNAME }}" 
+      password: "{{ DEV_PASS }}"
       port: "{{ ansible_jun_port }}"
       timeout: "{{ ansible_jun_timeout }}"
-#дальше блок самих задач
+#объявление самих задач задач
   tasks:
-#проверка доступности нашего порта
-  - name: junos check connection 
+#проверка доступности порта
+  - name: junos check port connection 
     wait_for:
       host: "{{ inventory_hostname }}"
       port: "{{ ansible_jun_port }}"
@@ -38,3 +38,48 @@
       role: super-user
       sshkey: "{{lookup('file', '/etc/ansible/.ssh/ansible.pub') }}"
       state: present
+#установка адресов на портах     
+- name: Set ipv4 address using aggregate
+  junos_l3_interface:
+    aggregate:
+    - name: fe-0/0/0
+      ipv4: 22.55.12.162
+    - name: fe-0/0/1
+      ipv4: 192.168.23.162   
+    - name: fe-0/0/2
+      ipv4: 192.168.21.162
+     - name: fe-0/0/7
+      ipv4: 172.16.118.162
+     - name: vlan
+      ipv4: 192.168.23.162
+#установка security zones    
+- name: set addresses
+  junos_command: 
+      comands:
+      -set security zones security-zone DMZ interfaces fe-0/0/1 host-inbound-traffic system-services all protocols all
+      -set security zones security-zone trust interfaces vlan fe-0/0/7 fe-0/0/2 host-inbound-traffic system-services all protocols all
+      -set security zones security-zone untrust interfaces fe-0/0/0 host-inbound-traffic system-services all protocols all
+#установка политик между зонами   
+- name: set policy trust-to-dmz
+  junos_command: 
+      comands:
+      -set security policies from-zone trust to-zone dmz policy trust-to-dmz match source-address any
+      -set security policies from-zone trust to-zone dmz policy trust-to-dmz match destination-address any
+      -set security policies from-zone trust to-zone dmz policy trust-to-dmz match application any
+      -set security policies from-zone trust to-zone dmz policy trust-to-dmz then permit
+      
+- name: set policy untrust-to-trust 
+  junos_command: 
+      comands:
+      -set security policies from-zone untrust to-zone trust policy untrust-to-trust match source-address any
+      -set security policies from-zone untrust to-zone trust policy untrust-to-trust match destination-address any
+      -set security policies from-zone untrust to-zone trust policy untrust-to-trust match application any
+      -set security policies from-zone untrust to-zone trust policy untrust-to-trust then permit
+      
+- name: set policy untrust-to-trust 
+  junos_command: 
+      comands:
+      -set security policies from-zone untrust to-zone dmz policy untrust-to-dmz match source-address any
+      -set security policies from-zone untrust to-zone dmz policy untrust-to-dmz match destination-address any
+      -set security policies from-zone untrust to-zone dmz policy untrust-to-dmz match application any
+      -set security policies from-zone untrust to-zone dmz policy untrust-to-dmz then permit
