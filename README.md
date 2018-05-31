@@ -8,9 +8,9 @@
 
 Установка Ansible проста, так как все из коробки:
 
-`sudo apt-add-repository ppa:ansible/ansible
-sudo apt-get update
-sudo apt-get install ansible`
+`sudo apt-add-repository ppa:ansible/ansible`
+`sudo apt-get update`
+`sudo apt-get install ansible`
 
 Изменим настройки в /etc/ansible/ansible.cfg
 
@@ -25,8 +25,8 @@ sudo apt-get install ansible`
 
 Установим данный модуль и проверим его в списке:
 
-`sudo ansible-galaxy install Juniper.junos
-ansible-galaxy list`
+`sudo ansible-galaxy install Juniper.junos`
+`ansible-galaxy list`
 
 Так же для использования модуля нам понадобиться nccclient
 
@@ -36,9 +36,9 @@ pip install ncclient`
 
 Для авторизации на устройствах хотелось бы сразу настроить авторизацию по ключу. Генерируем для удобства под root ключ RSA После копируем его в предварительно созданный /etc/ansible/.ssh для удобства использования.
 
-`ssh-keygen -t rsa
-cp /root/.ssh/id_rsa.pub /etc/ansible/.ssh/ansible.pub
-cp /root/.ssh/id_rsa /etc/ansible/.ssh/ansible`
+`ssh-keygen -t rsa`
+`cp /root/.ssh/id_rsa.pub /etc/ansible/.ssh/ansible.pub`
+`cp /root/.ssh/id_rsa /etc/ansible/.ssh/ansible`
 
 По итогу на целевых устройствах необходимо было бы завести вручную пользователя с публичным ключом:
 
